@@ -1,0 +1,124 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-1
+      author: Ivan
+      changes:
+        - createTable:
+            tableName: company_user
+            columns:
+              - column:
+                  name: id
+                  type: int8
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: company_user_pkey
+              - column:
+                  name: login
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: company_user_uniq_login
+
+  - changeSet:
+      id: 1-2
+      author: Ivan
+      changes:
+        - createTable:
+            tableName: patient_profile
+            columns:
+              - column:
+                  name: id
+                  type: int8
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: patient_profile_pkey
+              - column:
+                  name: first_name
+                  type: varchar(255)
+              - column:
+                  name: last_name
+                  type: varchar(255)
+              - column:
+                  name: old_client_guid
+                  type: varchar(255)
+              - column:
+                  name: status_id
+                  type: int2
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 1-3
+      author: Ivan
+      changes:
+        - createTable:
+            tableName: patient_note
+            columns:
+              - column:
+                  name: id
+                  type: int8
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: patient_note_pkey
+              - column:
+                  name: created_date_time
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified_date_time
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by_user_id
+                  type: int8
+              - column:
+                  name: last_modified_by_user_id
+                  type: int8
+              - column:
+                  name: note
+                  type: varchar(4000)
+              - column:
+                  name: patient_id
+                  type: int8
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 1-4
+      author: Ivan
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: patient_note
+            baseColumnNames: last_modified_by_user_id
+            constraintName: fk_pat_note_to_modifyed_user
+            referencedTableName: company_user
+            referencedColumnNames: id
+  - changeSet:
+      id: 1-5
+      author: Ivan
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: patient_note
+            baseColumnNames: created_by_user_id
+            constraintName: fk_pat_note_to_created_user
+            referencedTableName: company_user
+            referencedColumnNames: id
+  - changeSet:
+      id: 1-6
+      author: Ivan
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: patient_note
+            baseColumnNames: patient_id
+            constraintName: fk_pat_note_to_patient
+            referencedTableName: patient_profile
+            referencedColumnNames: id

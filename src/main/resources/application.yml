@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/clevertest
+    username: ivan
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    show-sql: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+    contexts: dev
+  #  mvc:
+  #    hiddenmethod:
+  #      filter:
+  #        enabled: true
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+#logging:
+#  level:
+#    ua.com.foxminded.university: INFO
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
