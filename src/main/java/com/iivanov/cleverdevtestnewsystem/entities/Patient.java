@@ -30,7 +30,7 @@ public class Patient {
     private String oldClientGuid;
 
     @Column(name = "status_id", nullable = false)
-    private Integer statusId;
+    private Status status;
 
     @Override
     public boolean equals(Object o) {
