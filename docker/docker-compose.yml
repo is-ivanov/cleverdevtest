@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  postgres_cleverdevtest:
+    image: postgres:13.1-alpine
+    environment:
+      POSTGRES_DB: "clevertest"
+      POSTGRES_USER: "ivan"
+      POSTGRES_PASSWORD: "1234"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - .:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
