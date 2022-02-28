@@ -1,12 +1,13 @@
 package com.iivanov.cleverdevtestnewsystem.entities;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Objects;
 
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -14,11 +15,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "patient_profile")
-public class Patient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+public class Patient extends AbstractEntity {
 
     @Column(name = "first_name")
     private String firstName;
@@ -30,7 +27,7 @@ public class Patient {
     private String oldClientGuid;
 
     @Column(name = "status_id", nullable = false)
-    private Status status;
+    private Integer status;
 
     @Override
     public boolean equals(Object o) {
@@ -38,7 +35,7 @@ public class Patient {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
             return false;
         Patient patient = (Patient) o;
-        return id != null && Objects.equals(id, patient.id);
+        return getId() != null && Objects.equals(getId(), patient.getId());
     }
 
     @Override

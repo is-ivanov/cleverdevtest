@@ -1,13 +1,14 @@
 package com.iivanov.cleverdevtestnewsystem.entities;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -15,11 +16,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "patient_note")
-public class Note {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+public class Note extends AbstractEntity {
 
     @Column(name = "created_date_time", nullable = false)
     private LocalDateTime createdDateTime;
@@ -51,7 +48,7 @@ public class Note {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
             return false;
         Note note = (Note) o;
-        return id != null && Objects.equals(id, note.id);
+        return getId() != null && Objects.equals(getId(), note.getId());
     }
 
     @Override
