@@ -10,14 +10,14 @@ import java.util.List;
 public interface Service<T extends AbstractEntity> {
 
     @Transactional(readOnly = true)
-    T findById(int id);
+    T findById(Long id);
 
     @Transactional(readOnly = true)
     List<T> findAll();
 
     T create(T entity);
 
-    T update(int id, T entity);
+//    T update(int id, T entity);
 
-    void delete(int id);
+    void delete(Long id);
 }

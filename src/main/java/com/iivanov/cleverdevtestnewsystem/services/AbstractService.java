@@ -14,7 +14,7 @@ public abstract class AbstractService<T extends AbstractEntity> implements Servi
 
     @Override
     @Transactional(readOnly = true)
-    public T findById(int id) {
+    public T findById(Long id) {
         return getRepo().findById(id)
             .orElseThrow(() ->
                 new MyEntityNotFoundException(getEntityName(), "id", id));
@@ -32,7 +32,7 @@ public abstract class AbstractService<T extends AbstractEntity> implements Servi
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         try {
             getRepo().deleteById(id);
         } catch (EmptyResultDataAccessException e) {

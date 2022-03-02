@@ -1,7 +1,6 @@
 package com.iivanov.cleverdevtestnewsystem.webclients;
 
 import com.iivanov.cleverdevtestnewsystem.dto.ClientNoteRequestDto;
-import com.iivanov.cleverdevtestnewsystem.dto.NoteResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -10,9 +9,10 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
-public class NoteClient {
+public class NoteWebClient {
 
     public static final String URI_NOTES = "/notes";
+
     private final WebClient webClient;
 
     public void getNotesByClient(final ClientNoteRequestDto dto) {

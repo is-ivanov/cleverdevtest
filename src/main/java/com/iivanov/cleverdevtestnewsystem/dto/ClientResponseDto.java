@@ -5,22 +5,18 @@ import com.iivanov.cleverdevtestnewsystem.util.Constants;
 import lombok.Builder;
 import lombok.Value;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Value
 @Builder
-public class NoteResponseDto {
-
-    String comments;
+public class ClientResponseDto {
+    String agency;
     String guid;
-
-    @JsonFormat(pattern = Constants.DATE_TIME_PATTERN)
-    LocalDateTime modifiedDateTime;
-
-    String clientGuid;
-
+    String firstName;
+    String lastName;
+    String status;
+    LocalDate dateOfBirthday;
     @JsonFormat(pattern = Constants.DATE_TIME_PATTERN)
     LocalDateTime createdDateTime;
-
-    String loggedUser;
 }
