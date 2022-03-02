@@ -5,7 +5,9 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @SuperBuilder
 @AllArgsConstructor
@@ -28,6 +30,10 @@ public class Patient extends AbstractEntity {
 
     @Column(name = "status_id", nullable = false)
     private short status;
+
+    @OneToMany(mappedBy = "patientProfile", orphanRemoval = true)
+    @ToString.Exclude
+    private Set<Note> notes = new LinkedHashSet<>();
 
     @Override
     public boolean equals(Object o) {
