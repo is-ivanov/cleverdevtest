@@ -3,11 +3,13 @@ package com.iivanov.cleverdevtestnewsystem.services;
 import com.iivanov.cleverdevtestnewsystem.dao.NoteRepository;
 import com.iivanov.cleverdevtestnewsystem.dto.ClientNoteRequestDto;
 import com.iivanov.cleverdevtestnewsystem.dto.ClientResponseDto;
+import com.iivanov.cleverdevtestnewsystem.dto.NoteResponseDto;
 import com.iivanov.cleverdevtestnewsystem.entities.Note;
 import com.iivanov.cleverdevtestnewsystem.entities.Patient;
 import com.iivanov.cleverdevtestnewsystem.services.interfaces.NoteService;
 import com.iivanov.cleverdevtestnewsystem.services.interfaces.PatientService;
 import com.iivanov.cleverdevtestnewsystem.webclients.ClientWebClient;
+import com.iivanov.cleverdevtestnewsystem.webclients.NoteWebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +34,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
     private final NoteRepository noteRepo;
     private final PatientService patientService;
     private final ClientWebClient clientWebClient;
+    private final NoteWebClient noteWebClient;
 
     @Override
     @Scheduled(cron = "${cron.start-import-notes}")
@@ -47,6 +51,15 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
                 .map(client -> new ClientNoteRequestDto(client.getAgency(),
                     dateFrom, dateTo, client.getGuid()))
                 .collect(Collectors.toList());
+        List<NoteResponseDto> notesFromServer =
+            noteWebClient.getNotesByClients(requestDtosForNotes);
+        Set<Note> existingNotesActivePatients = new LinkedHashSet<>();
+        activePatients.forEach(patient -> existingNotesActivePatients.addAll(patient.getNotes()));
+        notesFromServer.forEach(noteDto -> {
+            //TODO compare noteDto and existing note
+            //TODO if login not exist create user
+            //TODO save or update note
+        });
 
 
     }

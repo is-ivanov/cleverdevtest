@@ -1,11 +1,14 @@
 package com.iivanov.cleverdevtestnewsystem.webclients;
 
 import com.iivanov.cleverdevtestnewsystem.dto.ClientNoteRequestDto;
+import com.iivanov.cleverdevtestnewsystem.dto.NoteResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -15,18 +18,18 @@ public class NoteWebClient {
 
     private final WebClient webClient;
 
-    public void getNotesByClient(final ClientNoteRequestDto dto) {
+    public List<NoteResponseDto> getNotesByClients(final List<ClientNoteRequestDto> listDtos) {
+        return Flux.fromIterable(listDtos)
+            .flatMap(this::getNoteByClient)
+            .collect(Collectors.toList())
+            .share().block();
+    }
 
-
-        Mono<Object[]> response = webClient.post()
+    private Flux<NoteResponseDto> getNoteByClient(final ClientNoteRequestDto dto) {
+        return webClient.post()
             .uri(URI_NOTES)
-            .accept(MediaType.APPLICATION_JSON)
             .bodyValue(dto)
             .retrieve()
-            .bodyToMono(Object[].class)
-            .log();
-
-
-
+            .bodyToFlux(NoteResponseDto.class);
     }
 }
