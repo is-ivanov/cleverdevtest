@@ -27,12 +27,12 @@ public class Note extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
     @ToString.Exclude
-    private User companyUser;
+    private User userCreator;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_modified_by_user_id")
     @ToString.Exclude
-    private User companyUser1;
+    private User userEditor;
 
     @Column(name = "note", length = 4000)
     private String content;
@@ -41,6 +41,9 @@ public class Note extends AbstractEntity {
     @JoinColumn(name = "patient_id", nullable = false)
     @ToString.Exclude
     private Patient patientProfile;
+
+    @Column(name = "old_note_guid")
+    private String oldNoteGuid;
 
     @Override
     public boolean equals(Object o) {

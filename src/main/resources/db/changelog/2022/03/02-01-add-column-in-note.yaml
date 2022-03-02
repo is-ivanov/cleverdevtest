@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20220302-1
+      author: Ivan
+      changes:
+        - addColumn:
+            tableName: patient_note
+            columns:
+              - column:
+                  name: old_note_guid
+                  type: varchar(255)
