@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/clevertest
+    url: jdbc:postgresql://localhost:5432/clevertest?characterEncoding=utf8
     username: ivan
     password: 1234
     driver-class-name: org.postgresql.Driver
@@ -17,15 +17,10 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
-    contexts: dev
-  #  mvc:
-  #    hiddenmethod:
-  #      filter:
-  #        enabled: true
   jackson:
     serialization:
       INDENT_OUTPUT: true
-#logging:
-#  level:
-#    ua.com.foxminded.university: INFO
-#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+cron:
+  start-import-notes: 0 15 */2 * * *
+url-old-system: http://localhost:8081
+timeout-millis-requests: 1000
