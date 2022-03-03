@@ -1,8 +1,8 @@
 package com.iivanov.cleverdevtestnewsystem.services.interfaces;
 
-import com.iivanov.cleverdevtestnewsystem.entities.CompanyUser;
+import com.iivanov.cleverdevtestnewsystem.entities.User;
 
-public interface UserService extends Service<CompanyUser> {
+public interface UserService extends Service<User> {
 
-    CompanyUser findByLoginAndCreateIfMissing(String login);
+    User findByLoginAndCreateIfMissing(String login);
 }

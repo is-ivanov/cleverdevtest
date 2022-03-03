@@ -1,14 +1,14 @@
 package com.iivanov.cleverdevtestnewsystem.dao;
 
-import com.iivanov.cleverdevtestnewsystem.entities.CompanyUser;
+import com.iivanov.cleverdevtestnewsystem.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface CompanyUserRepository extends JpaRepository<CompanyUser, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<CompanyUser> findByLogin(String login);
+    Optional<User> findByLogin(String login);
 
 }

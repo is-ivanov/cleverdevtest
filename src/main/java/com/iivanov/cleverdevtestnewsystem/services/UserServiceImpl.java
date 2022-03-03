@@ -1,7 +1,7 @@
 package com.iivanov.cleverdevtestnewsystem.services;
 
-import com.iivanov.cleverdevtestnewsystem.dao.CompanyUserRepository;
-import com.iivanov.cleverdevtestnewsystem.entities.CompanyUser;
+import com.iivanov.cleverdevtestnewsystem.dao.UserRepository;
+import com.iivanov.cleverdevtestnewsystem.entities.User;
 import com.iivanov.cleverdevtestnewsystem.exceptions.MyEntityNotFoundException;
 import com.iivanov.cleverdevtestnewsystem.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserServiceImpl extends AbstractService<CompanyUser> implements UserService {
+public class UserServiceImpl extends AbstractService<User> implements UserService {
 
-    private final CompanyUserRepository userRepo;
+    private final UserRepository userRepo;
 
     @Override
-    public CompanyUser findByLoginAndCreateIfMissing(String login) {
+    public User findByLoginAndCreateIfMissing(String login) {
         try {
             return findByLogin(login);
         } catch (MyEntityNotFoundException e) {
@@ -27,23 +27,23 @@ public class UserServiceImpl extends AbstractService<CompanyUser> implements Use
         }
     }
 
-    private CompanyUser findByLogin(String login) {
+    private User findByLogin(String login) {
         return userRepo.findByLogin(login)
             .orElseThrow(() ->
                 new MyEntityNotFoundException(getEntityName(), "login", login));
     }
 
-    private CompanyUser create(String login) {
-        return userRepo.save(new CompanyUser(login));
+    private User create(String login) {
+        return userRepo.save(new User(login));
     }
 
     @Override
-    protected JpaRepository<CompanyUser, Long> getRepo() {
+    protected JpaRepository<User, Long> getRepo() {
         return userRepo;
     }
 
     @Override
     protected String getEntityName() {
-        return CompanyUser.class.getSimpleName();
+        return User.class.getSimpleName();
     }
 }

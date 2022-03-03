@@ -1,7 +1,6 @@
 package com.iivanov.cleverdevtestnewsystem.entities;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -26,12 +25,12 @@ public class Note extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
     @ToString.Exclude
-    private CompanyUser userCreator;
+    private User userCreator;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_modified_by_user_id")
     @ToString.Exclude
-    private CompanyUser userEditor;
+    private User userEditor;
 
     @Column(name = "note", length = 4000)
     private String content;

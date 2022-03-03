@@ -4,7 +4,7 @@ import com.iivanov.cleverdevtestnewsystem.dao.NoteRepository;
 import com.iivanov.cleverdevtestnewsystem.dto.ClientNoteRequestDto;
 import com.iivanov.cleverdevtestnewsystem.dto.ClientResponseDto;
 import com.iivanov.cleverdevtestnewsystem.dto.NoteResponseDto;
-import com.iivanov.cleverdevtestnewsystem.entities.CompanyUser;
+import com.iivanov.cleverdevtestnewsystem.entities.User;
 import com.iivanov.cleverdevtestnewsystem.entities.Note;
 import com.iivanov.cleverdevtestnewsystem.entities.Patient;
 import com.iivanov.cleverdevtestnewsystem.services.interfaces.NoteService;
@@ -146,7 +146,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
             existingNote.setContent(noteDto.getComments());
             existingNote.setModifiedDateTime(noteDto.getModifiedDateTime());
             existingNote.setCreatedDateTime(noteDto.getCreatedDateTime());
-            CompanyUser user =
+            User user =
                 userService.findByLoginAndCreateIfMissing(noteDto.getLoggedUser());
             existingNote.setUserCreator(user);
             existingNote.setUserEditor(user);
@@ -157,13 +157,13 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
     }
 
     private void create(NoteResponseDto noteDto, Patient patient) {
-        CompanyUser companyUser =
+        User user =
             userService.findByLoginAndCreateIfMissing(noteDto.getLoggedUser());
         Note newNote = new Note();
         newNote.setCreatedDateTime(noteDto.getCreatedDateTime());
         newNote.setModifiedDateTime(noteDto.getModifiedDateTime());
-        newNote.setUserCreator(companyUser);
-        newNote.setUserEditor(companyUser);
+        newNote.setUserCreator(user);
+        newNote.setUserEditor(user);
         newNote.setContent(noteDto.getComments());
         newNote.setPatient(patient);
         newNote.setOldNoteGuid(noteDto.getGuid());
