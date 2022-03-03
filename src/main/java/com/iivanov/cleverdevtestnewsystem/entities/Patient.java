@@ -9,7 +9,6 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -31,7 +30,7 @@ public class Patient extends AbstractEntity {
     @Column(name = "status_id", nullable = false)
     private short status;
 
-    @OneToMany(mappedBy = "patientProfile", orphanRemoval = true)
+    @OneToMany(mappedBy = "patient", orphanRemoval = true)
     @ToString.Exclude
     private Set<Note> notes = new LinkedHashSet<>();
 

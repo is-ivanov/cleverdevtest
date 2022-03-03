@@ -9,15 +9,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PatientServiceImpl extends AbstractService<Patient> implements PatientService {
+public class PatientServiceImpl extends AbstractService<Patient> implements
+    PatientService {
 
     public static final String GUID_DELIMITER = ",";
+
     private final PatientRepository patientRepo;
 
     @Override
@@ -27,14 +32,15 @@ public class PatientServiceImpl extends AbstractService<Patient> implements Pati
     }
 
     @Override
-    public Set<String> getGuidsFromPatients(List<Patient> patients) {
-        Set<String> guidsOfPatients = new HashSet<>();
+    public Map<String, Patient> getPatientsWithGuids(List<Patient> patients) {
+        Map<String, Patient> guidsOfPatients = new HashMap<>();
         patients.stream()
             .filter(patient -> patient.getOldClientGuid() != null)
             .forEach(patient -> {
                 String oldClientGuidsString = patient.getOldClientGuid();
                 String[] arrayGuids = oldClientGuidsString.split(GUID_DELIMITER);
-                guidsOfPatients.addAll(Arrays.asList(arrayGuids));
+                Arrays.stream(arrayGuids).forEach(guid ->
+                    guidsOfPatients.put(guid, patient));
             });
         return guidsOfPatients;
     }

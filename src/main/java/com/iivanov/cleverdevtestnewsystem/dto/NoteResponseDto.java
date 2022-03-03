@@ -2,25 +2,24 @@ package com.iivanov.cleverdevtestnewsystem.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.iivanov.cleverdevtestnewsystem.util.Constants;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class NoteResponseDto {
-
-    String comments;
-    String guid;
-
+    private String comments;
+    private String guid;
     @JsonFormat(pattern = Constants.DATE_TIME_PATTERN)
-    LocalDateTime modifiedDateTime;
-
-    String clientGuid;
-
+    private LocalDateTime modifiedDateTime;
+    private String clientGuid;
     @JsonFormat(pattern = Constants.DATE_TIME_PATTERN)
-    LocalDateTime createdDateTime;
-
-    String loggedUser;
+    private LocalDateTime createdDateTime;
+    private String loggedUser;
 }

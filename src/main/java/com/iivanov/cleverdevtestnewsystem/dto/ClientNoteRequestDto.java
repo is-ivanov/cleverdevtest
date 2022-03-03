@@ -1,14 +1,16 @@
 package com.iivanov.cleverdevtestnewsystem.dto;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Value
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ClientNoteRequestDto {
-    String agency;
-    LocalDate dateFrom;
-    LocalDate dateTo;
-    String clientGuid;
+    private String agency;
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+    private String clientGuid;
 }

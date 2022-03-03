@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -26,6 +27,10 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClientWithTimeout() {
+        final int size = 16 * 1024 * 1024;
+        final ExchangeStrategies strategies = ExchangeStrategies.builder()
+            .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(size))
+            .build();
         final HttpClient httpClient = HttpClient.create()
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout)
             .responseTimeout(Duration.ofMillis(timeout))
@@ -42,6 +47,7 @@ public class WebClientConfig {
                 headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
             })
             .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .exchangeStrategies(strategies)
             .build();
     }
 }

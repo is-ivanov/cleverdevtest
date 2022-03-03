@@ -17,7 +17,5 @@ public interface Service<T extends AbstractEntity> {
 
     T create(T entity);
 
-//    T update(int id, T entity);
-
     void delete(Long id);
 }

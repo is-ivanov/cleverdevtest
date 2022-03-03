@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -22,17 +21,17 @@ public class Note extends AbstractEntity {
     private LocalDateTime createdDateTime;
 
     @Column(name = "last_modified_date_time", nullable = false)
-    private LocalDateTime lastModifiedDateTime;
+    private LocalDateTime modifiedDateTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")
     @ToString.Exclude
-    private User userCreator;
+    private CompanyUser userCreator;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_modified_by_user_id")
     @ToString.Exclude
-    private User userEditor;
+    private CompanyUser userEditor;
 
     @Column(name = "note", length = 4000)
     private String content;
@@ -40,7 +39,7 @@ public class Note extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "patient_id", nullable = false)
     @ToString.Exclude
-    private Patient patientProfile;
+    private Patient patient;
 
     @Column(name = "old_note_guid")
     private String oldNoteGuid;

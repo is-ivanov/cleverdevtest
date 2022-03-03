@@ -8,7 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.Objects;
 
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,7 +15,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "company_user")
-public class User extends AbstractEntity {
+public class CompanyUser extends AbstractEntity {
 
     @NotEmpty
     @Column(name = "login", nullable = false, unique = true)
@@ -27,7 +26,7 @@ public class User extends AbstractEntity {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
             return false;
-        User user = (User) o;
+        CompanyUser user = (CompanyUser) o;
         return getId() != null && Objects.equals(getId(), user.getId());
     }
 

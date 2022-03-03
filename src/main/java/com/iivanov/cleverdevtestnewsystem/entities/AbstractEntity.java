@@ -13,7 +13,6 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 public abstract class AbstractEntity {
 
     @Id

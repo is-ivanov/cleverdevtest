@@ -8,7 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -21,8 +20,8 @@ public class NoteWebClient {
     public List<NoteResponseDto> getNotesByClients(final List<ClientNoteRequestDto> listDtos) {
         return Flux.fromIterable(listDtos)
             .flatMap(this::getNoteByClient)
-            .collect(Collectors.toList())
-            .share().block();
+            .collectList()
+            .block();
     }
 
     private Flux<NoteResponseDto> getNoteByClient(final ClientNoteRequestDto dto) {
