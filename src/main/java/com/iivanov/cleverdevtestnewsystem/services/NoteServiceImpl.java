@@ -14,10 +14,9 @@ import com.iivanov.cleverdevtestnewsystem.webclients.ClientWebClient;
 import com.iivanov.cleverdevtestnewsystem.webclients.NoteWebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,23 +35,35 @@ import java.util.stream.Collectors;
 @EnableScheduling
 public class NoteServiceImpl extends AbstractService<Note> implements NoteService {
 
+    private static final AtomicInteger counterCreateNotes = new AtomicInteger(0);
+    private static final AtomicInteger counterUpdateNotes = new AtomicInteger(0);
+    /*
+     * Т.к. старая система фильтрует и отдаёт заметки по дате создания,
+     * DateCompareUtils.isDateInPeriod(note.getCreatedDateTime().toLocalDate(), from, to)
+     * то нам необходимо постоянно загружать все заметки,
+     * поэтому в запрос для старой системы в поле 'dateTo' надо подставлять
+     * дату создания первой заметки. Её надо посмотреть и внести в эту константу.
+     * Если бы старая система фильтровала заметки по времени последнего изменения,
+     * то 'dateTo' можно было бы ставить вчерашний день. Т.к. обновляем каждые 2 часа,
+     * но передаём в теле запроса не дату и время, а только дату
+     * */
+    public static final LocalDate DATE_CREATE_FIRST_NOTE_IN_OLD_SYSTEM =
+        LocalDate.of(2010, 1, 1);
+
     private final NoteRepository noteRepo;
     private final PatientService patientService;
     private final ClientWebClient clientWebClient;
     private final NoteWebClient noteWebClient;
     private final UserService userService;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void doStart() {
-        importNotesFromOldSystem();
-    }
-
     @Override
-//    @Scheduled(cron = "${cron.start-import-notes}")
+    @Scheduled(cron = "${cron.start-import-notes}")
     public void importNotesFromOldSystem() {
         Map<String, Patient> guidsActivePatients = getActivePatients();
         List<NoteResponseDto> notesFromServer = getNotesFromOldSystem(guidsActivePatients);
-        //TODO add check size notes
+        if (notesFromServer.size() == 0) {
+            return;
+        }
         Map<String, Note> existingNotesActivePatients = new HashMap<>();
         guidsActivePatients.forEach((guid, patient) -> {
             Set<Note> notes = patient.getNotes();
@@ -60,6 +72,10 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
         });
         saveNotesInNewSystem(guidsActivePatients, notesFromServer,
             existingNotesActivePatients);
+        log.info("Create {} notes, update {} notes", counterCreateNotes,
+            counterUpdateNotes);
+        counterCreateNotes.set(0);
+        counterUpdateNotes.set(0);
     }
 
     @Override
@@ -75,6 +91,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
     private void saveNotesInNewSystem(Map<String, Patient> guidsActivePatients,
                                       List<NoteResponseDto> notesFromServer,
                                       Map<String, Note> existingNotesActivePatients) {
+
         notesFromServer.forEach(noteDto -> {
             String guidNoteDto = noteDto.getGuid();
             Patient patient = guidsActivePatients.get(noteDto.getClientGuid());
@@ -93,18 +110,20 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
         Map<String, Patient> guidsActivePatients) {
         List<ClientNoteRequestDto> bodiesForRequestForNotes =
             prepareRequestsBodies(guidsActivePatients);
-        return noteWebClient.getNotesByClients(bodiesForRequestForNotes);
+        List<NoteResponseDto> notesFromOldSystem = noteWebClient
+            .getNotesByClients(bodiesForRequestForNotes);
+        log.info("{} notes received from old system", notesFromOldSystem.size());
+        return notesFromOldSystem;
     }
 
     private List<ClientNoteRequestDto> prepareRequestsBodies(
         Map<String, Patient> guidsActivePatients) {
         List<ClientResponseDto> clientsFromOldSystem = clientWebClient.getClients();
         LocalDate dateTo = LocalDate.now();
-        LocalDate dateFrom = dateTo.minusDays(1);
         return clientsFromOldSystem.stream()
             .filter(client -> guidsActivePatients.containsKey(client.getGuid()))
             .map(client -> new ClientNoteRequestDto(client.getAgency(),
-                dateFrom, dateTo, client.getGuid()))
+                DATE_CREATE_FIRST_NOTE_IN_OLD_SYSTEM, dateTo, client.getGuid()))
             .collect(Collectors.toList());
     }
 
@@ -133,6 +152,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
             existingNote.setUserEditor(user);
             existingNote.setPatient(patient);
             noteRepo.save(existingNote);
+            counterUpdateNotes.getAndIncrement();
         }
     }
 
@@ -148,6 +168,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
         newNote.setPatient(patient);
         newNote.setOldNoteGuid(noteDto.getGuid());
         noteRepo.save(newNote);
+        counterCreateNotes.getAndIncrement();
     }
 
     private boolean isClientEquals(NoteResponseDto noteDto, Note existingNote) {
