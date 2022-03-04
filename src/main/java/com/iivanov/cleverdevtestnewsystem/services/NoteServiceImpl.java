@@ -15,7 +15,6 @@ import com.iivanov.cleverdevtestnewsystem.webclients.NoteWebClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 @Transactional
-@EnableScheduling
 public class NoteServiceImpl extends AbstractService<Note> implements NoteService {
 
     private static final AtomicInteger counterCreateNotes = new AtomicInteger(0);
@@ -137,7 +135,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
             !isModifiedDateTimeEquals(noteDto, existingNote) ||
             !isCreatedDateTimeEquals(noteDto, existingNote) ||
             !isUserEquals(noteDto, existingNote) ||
-            !isClientEquals(noteDto, existingNote);
+            !isPatientEquals(noteDto, existingNote);
     }
 
     private void update(NoteResponseDto noteDto, Patient patient, Note existingNote) {
@@ -147,7 +145,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
             existingNote.setModifiedDateTime(noteDto.getModifiedDateTime());
             existingNote.setCreatedDateTime(noteDto.getCreatedDateTime());
             User user =
-                userService.findByLoginAndCreateIfMissing(noteDto.getLoggedUser());
+                userService.findByLoginOrCreateIfMissing(noteDto.getLoggedUser());
             existingNote.setUserCreator(user);
             existingNote.setUserEditor(user);
             existingNote.setPatient(patient);
@@ -158,7 +156,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
 
     private void create(NoteResponseDto noteDto, Patient patient) {
         User user =
-            userService.findByLoginAndCreateIfMissing(noteDto.getLoggedUser());
+            userService.findByLoginOrCreateIfMissing(noteDto.getLoggedUser());
         Note newNote = new Note();
         newNote.setCreatedDateTime(noteDto.getCreatedDateTime());
         newNote.setModifiedDateTime(noteDto.getModifiedDateTime());
@@ -171,7 +169,7 @@ public class NoteServiceImpl extends AbstractService<Note> implements NoteServic
         counterCreateNotes.getAndIncrement();
     }
 
-    private boolean isClientEquals(NoteResponseDto noteDto, Note existingNote) {
+    private boolean isPatientEquals(NoteResponseDto noteDto, Note existingNote) {
         return existingNote.getPatient().getOldClientGuid().contains(noteDto.getClientGuid());
     }
 

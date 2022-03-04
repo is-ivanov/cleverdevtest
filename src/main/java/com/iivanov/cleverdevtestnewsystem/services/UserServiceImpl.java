@@ -19,7 +19,7 @@ public class UserServiceImpl extends AbstractService<User> implements UserServic
     private final UserRepository userRepo;
 
     @Override
-    public User findByLoginAndCreateIfMissing(String login) {
+    public User findByLoginOrCreateIfMissing(String login) {
         try {
             return findByLogin(login);
         } catch (MyEntityNotFoundException e) {
