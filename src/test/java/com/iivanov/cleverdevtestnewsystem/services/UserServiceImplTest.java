@@ -46,7 +46,7 @@ class UserServiceImplTest {
 
             when(repoMock.findByLogin(anyString())).thenReturn(optionalFromRepo);
 
-            User actualUser = userService.findByLoginAndCreateIfMissing(anyString());
+            User actualUser = userService.findByLoginOrCreateIfMissing(anyString());
 
             assertThat(actualUser).isEqualTo(user);
             verify(repoMock, never()).save(any());
@@ -59,7 +59,7 @@ class UserServiceImplTest {
 
             when(repoMock.findByLogin(USER_LOGIN)).thenReturn(emptyOptional);
 
-            userService.findByLoginAndCreateIfMissing(USER_LOGIN);
+            userService.findByLoginOrCreateIfMissing(USER_LOGIN);
 
             verify(repoMock).save(userCaptor.capture());
             User capturedUser = userCaptor.getValue();
