@@ -40,7 +40,7 @@ class UserServiceImplTest {
         @Test
         @DisplayName("when Repo return Optional with user then shouldn't call " +
             "Repo.save() method and return this user")
-        void whenRepoReturnUserThenShouldnTCallRepoSaveMethod() {
+        void whenRepoReturnUser_NotCallRepoSaveMethod() {
             User user = new User(1L, USER_LOGIN);
             Optional<User> optionalFromRepo = Optional.of(user);
 
@@ -54,7 +54,7 @@ class UserServiceImplTest {
 
         @Test
         @DisplayName("when Repo return empty Optional then should call Repo.save()")
-        void whenRepoReturnEmptyOptionalThenShouldCallRepoSave() {
+        void whenRepoReturnEmptyOptional_CallRepoSave() {
             Optional<User> emptyOptional = Optional.empty();
 
             when(repoMock.findByLogin(USER_LOGIN)).thenReturn(emptyOptional);
