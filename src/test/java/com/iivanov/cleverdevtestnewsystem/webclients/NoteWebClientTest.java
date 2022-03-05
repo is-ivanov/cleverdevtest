@@ -1,6 +1,10 @@
 package com.iivanov.cleverdevtestnewsystem.webclients;
 
 import com.iivanov.cleverdevtestnewsystem.dto.ClientNoteRequestDto;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -9,13 +13,19 @@ import org.springframework.boot.test.json.BasicJsonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.logging.AdvancedByteBufFormat;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static com.iivanov.cleverdevtestnewsystem.util.TestObjects.AGENCY_FIRST_PATIENT;
-import static com.iivanov.cleverdevtestnewsystem.util.TestObjects.createTestClientNoteRequestDtos;
+import static com.iivanov.cleverdevtestnewsystem.util.TestObjects.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NoteWebClientTest {
@@ -40,7 +50,29 @@ class NoteWebClientTest {
     void setUp() {
         String baseUrl = String.format("http://localhost:%s",
             mockServer.getPort());
-        WebClient webClient = WebClient.create(baseUrl);
+        final int size = 16 * 1024 * 1024;
+        final ExchangeStrategies strategies = ExchangeStrategies.builder()
+            .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(size))
+            .build();
+        final HttpClient httpClient = HttpClient.create()
+            .wiretap("reactor.netty.http.client.HttpClient",
+                LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
+            .responseTimeout(Duration.ofMillis(1000))
+            .doOnConnected(conn ->
+                conn.addHandlerLast(new ReadTimeoutHandler(1000,
+                        TimeUnit.MILLISECONDS))
+                    .addHandlerLast(new WriteTimeoutHandler(1000,
+                        TimeUnit.MILLISECONDS)));
+        WebClient webClient = WebClient.builder()
+            .baseUrl(baseUrl)
+            .defaultHeaders(headers -> {
+                headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+                headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+            })
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .exchangeStrategies(strategies)
+            .build();
         this.noteWebClient = new NoteWebClient(webClient);
     }
 
@@ -50,8 +82,9 @@ class NoteWebClientTest {
         @Test
         @DisplayName("verify request and serialization body")
         void verifyRequestAndSerializationBody() throws InterruptedException {
+            ClientNoteRequestDto objectForRequest = createTestClientNoteRequestDto1();
             List<ClientNoteRequestDto> listRequestObjects =
-                createTestClientNoteRequestDtos();
+                new ArrayList<>(List.of(objectForRequest));
             String bodyResponse = """
                 [
                     {
@@ -84,9 +117,11 @@ class NoteWebClientTest {
             JsonContent<Object> bodyRequest = json.from(request.getBody().readUtf8());
             assertThat(request.getMethod()).isEqualTo("POST");
             assertThat(request.getPath()).isEqualTo("/notes");
-
+            System.out.println(bodyRequest);
             assertThat(bodyRequest).extractingJsonPathStringValue("$.agency")
                 .isEqualTo(AGENCY_FIRST_PATIENT);
+            assertThat(bodyRequest).extractingJsonPathStringValue("$.clientGuid")
+                .isEqualTo(GUID_FIRST_PATIENT);
         }
     }
 }
